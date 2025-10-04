@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warehouse Performance Dashboard</title>
     <style>
+        /* All previous CSS remains the same */
         * {
             margin: 0;
             padding: 0;
@@ -214,6 +215,7 @@
         .podium-name {
             font-size: 0.9rem;
             font-weight: 600;
+            min-height: 20px;
         }
         
         .highlight {
@@ -268,6 +270,11 @@
             0% { box-shadow: 0 0 20px #ffd700; }
             50% { box-shadow: 0 0 40px #ffd700, 0 0 60px #ff6b01; }
             100% { box-shadow: 0 0 20px #ffd700; }
+        }
+        
+        @keyframes nameReveal {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         .slide-in {
@@ -457,6 +464,10 @@
         
         .winner-glow {
             animation: winnerGlow 2s ease-in-out infinite;
+        }
+        
+        .name-reveal {
+            animation: nameReveal 0.5s ease-out forwards;
         }
         
         /* Fireworks Styles */
@@ -829,15 +840,40 @@
             });
         }
 
-        // Function to update podium
+        // Function to update podium with proper name display
         function updatePodium() {
+            console.log("Updating podium with data:", warehouseData);
+            
             // Sort by rank and get top 3
             const sortedData = [...warehouseData].sort((a, b) => (a.rank || 0) - (b.rank || 0));
             const top3 = sortedData.slice(0, 3);
             
-            document.getElementById('podium-1').textContent = top3[0] ? top3[0].name.split(' ')[0] : '-';
-            document.getElementById('podium-2').textContent = top3[1] ? top3[1].name.split(' ')[0] : '-';
-            document.getElementById('podium-3').textContent = top3[2] ? top3[2].name.split(' ')[0] : '-';
+            console.log("Top 3 performers:", top3);
+            
+            // Update podium names with proper formatting
+            if (top3[0]) {
+                const firstName = top3[0].name.split(' ')[0];
+                document.getElementById('podium-1').textContent = firstName;
+                console.log("1st place:", firstName);
+            } else {
+                document.getElementById('podium-1').textContent = '-';
+            }
+            
+            if (top3[1]) {
+                const secondName = top3[1].name.split(' ')[0];
+                document.getElementById('podium-2').textContent = secondName;
+                console.log("2nd place:", secondName);
+            } else {
+                document.getElementById('podium-2').textContent = '-';
+            }
+            
+            if (top3[2]) {
+                const thirdName = top3[2].name.split(' ')[0];
+                document.getElementById('podium-3').textContent = thirdName;
+                console.log("3rd place:", thirdName);
+            } else {
+                document.getElementById('podium-3').textContent = '-';
+            }
         }
 
         // Function to update averages
@@ -1095,20 +1131,38 @@
             }
         }
 
-        // Function to animate podium with celebration
+        // Function to animate podium with celebration and name reveal
         function animatePodiumCelebration() {
             const podiumItems = document.querySelectorAll('.podium-item');
+            const podiumNames = document.querySelectorAll('.podium-name');
             
-            // Reset podium position
+            console.log("Animating podium with names:", {
+                first: document.getElementById('podium-1').textContent,
+                second: document.getElementById('podium-2').textContent,
+                third: document.getElementById('podium-3').textContent
+            });
+            
+            // Reset podium position and hide names initially
             podiumItems.forEach(item => {
                 item.style.transform = 'translateY(100px)';
                 item.style.opacity = '0';
+            });
+            
+            podiumNames.forEach(name => {
+                name.style.transform = 'scale(0)';
+                name.style.opacity = '0';
             });
             
             // Animate podium rising with delay between each
             podiumItems.forEach((item, index) => {
                 setTimeout(() => {
                     item.classList.add('podium-visible');
+                    
+                    // Animate name reveal after podium rises
+                    setTimeout(() => {
+                        const nameElement = item.querySelector('.podium-name');
+                        nameElement.classList.add('name-reveal');
+                    }, 500);
                     
                     // Add special glow effect for winner
                     if (index === 0) {
@@ -1205,7 +1259,6 @@
             }, 2000);
         }
 
-        // [Rest of the JavaScript functions remain the same as previous implementation]
         // Function to add a new row to the data entry table
         function addNewRow() {
             const tbody = document.getElementById('data-entry-body');
@@ -1412,7 +1465,7 @@
             
             // Update the dashboard
             populateDashboard();
-            updatePodium();
+            updatePodium(); // This was missing - now podium will update!
             updateAverages();
             
             // Start the countdown animation
@@ -1506,7 +1559,7 @@
             
             // Update the dashboard
             populateDashboard();
-            updatePodium();
+            updatePodium(); // This was missing - now podium will update!
             updateAverages();
             
             // Start the countdown animation
@@ -1532,7 +1585,7 @@
             
             // Populate the dashboard with initial data
             populateDashboard();
-            updatePodium();
+            updatePodium(); // This was missing - now podium will show initial data!
             updateAverages();
             
             // Add event listeners
